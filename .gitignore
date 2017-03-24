@@ -74,4 +74,4 @@ meta
 
 
 
-/src/main/resources/observatory/*.csv
+/src/main/resources/*.csv
