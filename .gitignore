@@ -75,3 +75,4 @@ meta
 
 
 /src/main/resources/*.csv
+/src/test/resources/*.csv

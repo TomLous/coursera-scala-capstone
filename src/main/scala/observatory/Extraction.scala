@@ -2,10 +2,16 @@ package observatory
 
 import java.time.LocalDate
 
+import util.SparkJob
+import org.apache.spark.sql._
+import org.apache.spark.sql.functions._
+
 /**
   * 1st milestone: data extraction
   */
-object Extraction {
+object Extraction extends SparkJob{
+
+  import spark.implicits._
 
   /**
     * @param year             Year number
@@ -14,6 +20,22 @@ object Extraction {
     * @return A sequence containing triplets (date, location, temperature)
     */
   def locateTemperatures(year: Int, stationsFile: String, temperaturesFile: String): Iterable[(LocalDate, Location, Double)] = {
+    spark
+      .read
+
+      .option("header", false)
+      .option("sep", ",")
+      .option("ignoreLeadingWhiteSpace", true)
+      .option("ignoreTrailingWhiteSpace", true)
+      .option("quote", "")
+      .option("nullValue", "")
+      .option("mode", "FAILFAST")
+
+
+      .csv(stationsFile).toDF()
+
+    .show()
+
     ???
   }
 
