@@ -7,15 +7,15 @@ import observatory.Location
   * Copyright © 2017 Datlinq B.V..
   */
 case class Station(
-                    STNid: String,
+                    STNid: Option[String],
                     WBANid: Option[String],
                     latitude: Option[Double],
                     longitude: Option[Double]
                   ){
-  val composedId:String = STNid + WBANid.getOrElse("")
+  val composedId:String = STNid.getOrElse("") + "*" + WBANid.getOrElse("")
 
   val location:Option[Location] = (latitude, longitude) match {
-    case (Some(lat), Some(lon)) => Some(Location(lat, lon))
+    case (Some(lat), Some(lon)) if lat!=0.0 && lon!=0.0 => Some(Location(lat, lon))
     case _ => None
   }
 }
