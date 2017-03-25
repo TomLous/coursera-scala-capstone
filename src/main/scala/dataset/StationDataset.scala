@@ -6,7 +6,7 @@ import org.apache.spark.sql.{Dataset, SparkSession}
 
 /**
   * Created by Tom Lous on 25/03/17.
-  * Copyright © 2017 Datlinq B.V..
+  * Copyright © 2017 Tom Lous
   */
 object StationDataset {
 

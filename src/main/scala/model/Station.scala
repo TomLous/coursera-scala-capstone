@@ -4,7 +4,7 @@ import observatory.Location
 
 /**
   * Created by Tom Lous on 24/03/17.
-  * Copyright © 2017 Datlinq B.V..
+  * Copyright © 2017 Tom Lous
   */
 case class Station(
                     STNid: Option[String],

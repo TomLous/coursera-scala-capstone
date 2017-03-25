@@ -8,7 +8,7 @@ import org.scalatest.prop.Checkers
 
 /**
   * Created by Tom Lous on 25/03/17.
-  * Copyright © 2017 Datlinq B.V..
+  * Copyright © 2017 Tom Lous
   */
 @RunWith(classOf[JUnitRunner])
 class StationTest extends FunSuite with Checkers {
