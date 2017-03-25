@@ -8,9 +8,9 @@ import com.sksamuel.scrimage.{Image, Pixel}
 object Visualization {
 
   /**
-    * @param temperatures Known temperatures: pairs containing a location and the temperature at this location
-    * @param location Location where to predict the temperature
-    * @return The predicted temperature at `location`
+    * @param temperatures Known temperatures: pairs containing a location and the celsius at this location
+    * @param location Location where to predict the celsius
+    * @return The predicted celsius at `location`
     */
   def predictTemperature(temperatures: Iterable[(Location, Double)], location: Location): Double = {
     ???

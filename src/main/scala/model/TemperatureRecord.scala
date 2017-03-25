@@ -6,7 +6,7 @@ import scala.util.Try
 
 /**
   * Created by Tom Lous on 24/03/17.
-  * Copyright © 2017 Tom Lous
+  * Copyright © 2017 Tom Lous 
   */
 case class TemperatureRecord(
                               STNid: Option[String],
@@ -20,8 +20,8 @@ case class TemperatureRecord(
 
   val localDate:Option[LocalDate] = Try(LocalDate.of(year,month,day)).toOption
 
-  val temperature:Option[Double] = fahrenheit match {
-    case Some(t) if t > -130.0 && t < 212 => Some(t)
+  val celsius:Option[Double] = fahrenheit match {
+    case Some(t) if t > -130.0 && t < 212 => Some((t - 32) * 5 / 9)
     case _ => None
   }
 

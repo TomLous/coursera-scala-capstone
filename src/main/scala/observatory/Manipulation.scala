@@ -16,8 +16,8 @@ object Manipulation {
 
   /**
     * @param temperaturess Sequence of known temperatures over the years (each element of the collection
-    *                      is a collection of pairs of location and temperature)
-    * @return A function that, given a latitude and a longitude, returns the average temperature at this location
+    *                      is a collection of pairs of location and celsius)
+    * @return A function that, given a latitude and a longitude, returns the average celsius at this location
     */
   def average(temperaturess: Iterable[Iterable[(Location, Double)]]): (Int, Int) => Double = {
     ???
