@@ -1,13 +1,17 @@
-package observatory
+package model
 
-import model.Station
+import observatory.Location
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.prop.Checkers
 
+/**
+  * Created by Tom Lous on 25/03/17.
+  * Copyright © 2017 Datlinq B.V..
+  */
 @RunWith(classOf[JUnitRunner])
-class ModelTest  extends FunSuite with Checkers {
+class StationTest extends FunSuite with Checkers {
 
   test("Station ab"){
     val s = Station(Some("a"),Some("b"),Some(+1.2), Some(-2.3))
@@ -38,7 +42,4 @@ class ModelTest  extends FunSuite with Checkers {
 
     assert(s.location === None)
   }
-
-
 }
-
