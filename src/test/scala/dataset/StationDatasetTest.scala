@@ -32,6 +32,5 @@ class StationDatasetTest  extends FunSuite with Checkers with SparkJob {
     assert(s === Station(Some("035770"), Some("35046"), Some(52.367), Some(0.483)))
     assert(s.composedId === "035770*35046")
     assert(s.location === Some(Location(52.367,0.483)))
-    //    stations.take()
   }
 }
