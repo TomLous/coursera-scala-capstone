@@ -10,7 +10,7 @@ trait SparkJob {
 
   implicit val spark:SparkSession = SparkSession
     .builder()
-    .master("local[4]")
+    .master("local[6]")
     .appName(this.getClass.getSimpleName)
     .getOrCreate()
 

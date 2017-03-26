@@ -31,7 +31,7 @@ object Extraction extends SparkJob {
         '_c3.alias("longitude").cast(DoubleType)
       )
       .where('_c2.isNotNull && '_c3.isNotNull && '_c2 =!= 0.0 && '_c3 =!= 0.0)
-      .persist()
+//      .persist()
 
     val temperatures = spark
       .read
@@ -58,10 +58,9 @@ object Extraction extends SparkJob {
       })
 
 
-    joined.collect().map{
+    joined.collect().iterator.map{
       case ((day, month, year), location, temperature) => (LocalDate.of(year,month,day), location, temperature)
-    }
-
+    }.toIterable
   }
 
   /**
