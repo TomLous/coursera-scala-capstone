@@ -24,7 +24,7 @@ class TemperatureDatasetTest extends FunSuite with Checkers with SparkJob {
     temperartures.show()
   }
 
-  test("get first Temperature record"){
+ /* test("get first Temperature record"){
     assert(temperartures.head() === TemperatureRecord(Some("010010"),None,1,1,1975,Some(23.2)))
   }
 
@@ -37,6 +37,6 @@ class TemperatureDatasetTest extends FunSuite with Checkers with SparkJob {
     assert(t.composedId === "037970*35047")
     assert(t.localDate === Some(LocalDate.of(1975,1,1)))
     assert(t.celsius === Some((45.7-32)/9*5))
-  }
+  }*/
 
 }
