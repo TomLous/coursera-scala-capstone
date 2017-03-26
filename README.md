@@ -1,4 +1,4 @@
-# Coursera's & EPFL's Scala Captstone 
+# Coursera'stations & EPFL'stations Scala Captstone 
 
 <https://www.coursera.org/learn/scala-capstone>
 
