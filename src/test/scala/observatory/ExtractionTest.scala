@@ -15,9 +15,9 @@ class ExtractionTest extends FunSuite with SparkJob {
   val stationsPath:String = resourcePath("/stations.csv")
   val temperaturePath:String = resourcePath(s"/$year.csv")
 
-  lazy val stations:Dataset[Station] = Extraction.stations(stationsPath)
-  lazy val temperatures:Dataset[TemperatureRecord] = Extraction.temperatures(year, temperaturePath)
-  lazy val joined:Dataset[JoinedFormat] = Extraction.joined(stations, temperatures)
+  lazy val stations:Dataset[Station] = Extraction.stations(stationsPath).persist
+  lazy val temperatures:Dataset[TemperatureRecord] = Extraction.temperatures(year, temperaturePath).persist
+  lazy val joined:Dataset[JoinedFormat] = Extraction.joined(stations, temperatures).persist
 
   lazy val test = Extraction.locateTemperatures(year, stationsPath, temperaturePath)
 
