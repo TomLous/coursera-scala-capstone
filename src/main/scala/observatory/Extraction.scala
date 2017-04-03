@@ -2,7 +2,7 @@ package observatory
 
 import java.time.LocalDate
 
-import util.SparkJob
+import utils.SparkJob
 import org.apache.spark.sql._
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.{DoubleType, IntegerType}

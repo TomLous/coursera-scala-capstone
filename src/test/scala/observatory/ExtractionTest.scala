@@ -4,8 +4,8 @@ import org.apache.spark.sql.Dataset
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
-import util.SparkJob
-import util.Resources._
+import utils.SparkJob
+import utils.Resources._
 
 @RunWith(classOf[JUnitRunner])
 class ExtractionTest extends FunSuite with SparkJob {

@@ -1,4 +1,4 @@
-package util
+package observatory.utils
 
 import java.nio.file.Paths
 
