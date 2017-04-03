@@ -3,6 +3,7 @@ package observatory
 import java.time.LocalDate
 
 import utils.SparkJob
+import utils.Resources._
 import org.apache.spark.sql._
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.{DoubleType, IntegerType}
@@ -18,7 +19,7 @@ object Extraction extends SparkJob {
   def stations(stationsFile: String): Dataset[Station] = {
     spark
       .read
-      .csv(stationsFile)
+      .csv(resourcePath(stationsFile))
       .select(
         concat_ws("~", coalesce('_c0, lit("")), '_c1).alias("id"),
         '_c2.alias("latitude").cast(DoubleType),
@@ -31,7 +32,7 @@ object Extraction extends SparkJob {
   def temperatures(year: Int,temperaturesFile: String): Dataset[TemperatureRecord] = {
     spark
       .read
-      .csv(temperaturesFile)
+      .csv(resourcePath(temperaturesFile) )
       .select(
         concat_ws("~", coalesce('_c0, lit("")), '_c1).alias("id"),
         '_c3.alias("day").cast(IntegerType),
