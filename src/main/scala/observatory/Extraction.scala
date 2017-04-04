@@ -64,7 +64,11 @@ object Extraction extends SparkJob {
     val j = joined(stations(stationsFile), temperatures(year, temperaturesFile))
 
     //    // It'stations a shame we have to use the LocalDate because Spark cannot encode that. hence this ugly bit
-    j.collect().par.iterator.map(jf => (jf.date.toLocalDate, jf.location, jf.temperature)).toIterable
+    j.collect()
+      .par
+      .map(
+        jf => (jf.date.toLocalDate, jf.location, jf.temperature)
+      ).seq
   }
 
   /**
@@ -72,7 +76,14 @@ object Extraction extends SparkJob {
     * @return A sequence containing, for each location, the average temperature over the year.
     */
   def locationYearlyAverageRecords(records: Iterable[(LocalDate, Location, Double)]): Iterable[(Location, Double)] = {
-    records.par.groupBy(_._2).mapValues(l => l.foldLeft(0.0)((t,r) => t + r._3) / l.size).seq
+    records
+      .par
+      .groupBy(_._2)
+      .mapValues(
+        l => l.foldLeft(0.0)(
+          (t,r) => t + r._3) / l.size
+      )
+      .seq
   }
 
 }

@@ -1,11 +1,16 @@
 package observatory
 
 import com.sksamuel.scrimage.{Image, Pixel}
+import Math._
+
+import scala.collection.parallel.ParIterable
 
 /**
   * 2nd milestone: basic visualization
   */
 object Visualization {
+
+
 
   /**
     * @param temperatures Known temperatures: pairs containing a location and the temperature at this location
@@ -13,7 +18,18 @@ object Visualization {
     * @return The predicted temperature at `location`
     */
   def predictTemperature(temperatures: Iterable[(Location, Double)], location: Location): Double = {
-    ???
+    val distanceTemperatureCombi:ParIterable[(Double, Double)] = temperatures.par.map {
+      case (otherLocation, temperature) => (location.point greatCircleDistance otherLocation.point, temperature)
+    }
+
+
+
+//    distanceTemperatureCombi.filter(_._1 == 0.0) match {
+//      case l if l.isEmpty =>
+//      case l => l.head._2
+//    }
+//    ParIterable.empty[()]
+    Double.PositiveInfinity
   }
 
   /**
