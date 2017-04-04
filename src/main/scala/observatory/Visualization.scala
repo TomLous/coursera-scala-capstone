@@ -34,7 +34,6 @@ object Visualization {
         {
           case ((wsA, iwsA),(wsB, iwsB)) => (wsA + wsB, iwsA + iwsB)
         }
-
       )
 
     weightedSum / inverseWeightedSum
