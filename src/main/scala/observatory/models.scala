@@ -32,6 +32,7 @@ case class Point(ϕ: Double, λ: Double) {
 
 }
 
+
 case class Color(red: Int, green: Int, blue: Int)
 
 case class Joined(id: String, latitude:Double, longitude: Double, day: Int, month: Int, year: Int, temperature: Double)
