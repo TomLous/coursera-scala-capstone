@@ -19,10 +19,16 @@ class VisualizationTest extends FunSuite with Checkers with SparkJob {
   lazy val locateTemperatures = Extraction.locateTemperatures(year, stationsPath, temperaturePath)
   lazy val locateAverage = Extraction.locationYearlyAverageRecords(locateTemperatures)
 
+
+
   test("locationYearlyAverageRecords"){
     if(debug) locateAverage.take(20).foreach(println)
     assert(locateAverage.count(_._1==Location(70.933,-8.667)) === 1)
     assert(locateAverage.size === 8251)
+  }
+
+  test("Distance 0.0"){
+    val visualization = Visualization.predictTemperature(locateAverage, Location(67.55,-63.783))
   }
 
   /*

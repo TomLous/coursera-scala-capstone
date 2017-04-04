@@ -1,7 +1,8 @@
 package observatory
 
 import com.sksamuel.scrimage.{Image, Pixel}
-import Math._
+import math._
+
 
 import scala.collection.parallel.ParIterable
 
@@ -10,6 +11,34 @@ import scala.collection.parallel.ParIterable
   */
 object Visualization {
 
+  def distanceTemperatureCombi(temperatures: Iterable[(Location, Double)], location: Location): ParIterable[(Double, Double)] = temperatures.par.map {
+      case (otherLocation, temperature) => (location.point greatCircleDistance otherLocation.point, temperature)
+  }
+
+  /**
+    * https://en.wikipedia.org/wiki/Inverse_distance_weighting
+    * @param distanceTemperatureCombinations
+    * @param power
+    * @return
+    */
+  def inverseDistanceWeighted(distanceTemperatureCombinations: ParIterable[(Double, Double)], power: Int): Double = {
+
+    val (weightedSum, inverseWeightedSum) = distanceTemperatureCombinations
+      .aggregate((0.0, 0.0))(
+        {
+          case ((ws, iws), (distance, temp)) => {
+            val w = 1 / pow(distance, power)
+            (w * temp + ws, w + iws)
+          }
+        },
+        {
+          case ((wsA, iwsA),(wsB, iwsB)) => (wsA + wsB, iwsA + iwsB)
+        }
+
+      )
+
+    weightedSum / inverseWeightedSum
+  }
 
 
   /**
@@ -18,18 +47,16 @@ object Visualization {
     * @return The predicted temperature at `location`
     */
   def predictTemperature(temperatures: Iterable[(Location, Double)], location: Location): Double = {
-    val distanceTemperatureCombi:ParIterable[(Double, Double)] = temperatures.par.map {
-      case (otherLocation, temperature) => (location.point greatCircleDistance otherLocation.point, temperature)
+    val exactTemperature = temperatures
+      .par
+      .filter(_._1 == location)
+      .map(_._2)
+      .headOption
+
+    exactTemperature match {
+      case Some(temp) => temp
+      case _ => inverseDistanceWeighted(distanceTemperatureCombi(temperatures, location), power=3)
     }
-
-
-
-//    distanceTemperatureCombi.filter(_._1 == 0.0) match {
-//      case l if l.isEmpty =>
-//      case l => l.head._2
-//    }
-//    ParIterable.empty[()]
-    Double.PositiveInfinity
   }
 
   /**
