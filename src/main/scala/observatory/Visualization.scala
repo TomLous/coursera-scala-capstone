@@ -122,7 +122,7 @@ object Visualization {
   def linearInterpolationValue(pointValueMin: Double, pointValueMax: Double, value: Double)(colorValueMin: Int, colorValueMax: Int): Int = {
     val factor = (value - pointValueMin) / (pointValueMax - pointValueMin)
 
-    (colorValueMin + (colorValueMax - colorValueMin) * factor).toInt
+    round(colorValueMin + (colorValueMax - colorValueMin) * factor).toInt
   }
 
   def posToLocation(imageWidth: Int, imageHeight: Int)(pos: Int): Location = {
