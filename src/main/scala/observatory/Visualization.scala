@@ -1,18 +1,30 @@
 package observatory
 
+import java.sql.Timestamp
+import java.time.LocalDate
+import java.util.concurrent.ConcurrentLinkedQueue
+
 import com.sksamuel.scrimage.{Image, Pixel}
+import org.apache.commons.collections.buffer.SynchronizedBuffer
+
 import math._
-
-
+import scala.collection._
+import scala.collection.mutable.ArrayBuffer
 import scala.collection.parallel.ParIterable
+import scala.collection.parallel.immutable.ParSeq
 
 /**
   * 2nd milestone: basic visualization
   */
 object Visualization {
 
-  def distanceTemperatureCombi(temperatures: Iterable[(Location, Double)], location: Location): ParIterable[(Double, Double)] = temperatures.par.map {
-    case (otherLocation, temperature) => (location.point greatCircleDistance otherLocation.point, temperature)
+//  val timings = new ConcurrentLinkedQueue[(String, Long)]
+
+
+  def distanceTemperatureCombi(temperatures: Iterable[(Location, Double)], location: Location): Iterable[(Double, Double)] = {
+    temperatures.map {
+      case (otherLocation, temperature) => (location.point greatCircleDistance otherLocation.point, temperature)
+    }
   }
 
   /**
@@ -22,8 +34,7 @@ object Visualization {
     * @param power
     * @return
     */
-  def inverseDistanceWeighted(distanceTemperatureCombinations: ParIterable[(Double, Double)], power: Int): Double = {
-
+  def inverseDistanceWeighted(distanceTemperatureCombinations: Iterable[(Double, Double)], power: Int): Double = {
     val (weightedSum, inverseWeightedSum) = distanceTemperatureCombinations
       .aggregate((0.0, 0.0))(
         {
@@ -36,6 +47,7 @@ object Visualization {
         }
       )
 
+
     weightedSum / inverseWeightedSum
   }
 
@@ -46,16 +58,18 @@ object Visualization {
     * @return The predicted temperature at `location`
     */
   def predictTemperature(temperatures: Iterable[(Location, Double)], location: Location): Double = {
-    val exactTemperature = temperatures
+    /*val exactTemperature = temperatures
       .par
       .filter(_._1 == location)
       .map(_._2)
       .headOption
 
-    exactTemperature match {
+    val res =exactTemperature match {
       case Some(temp) => temp
       case _ => inverseDistanceWeighted(distanceTemperatureCombi(temperatures, location), power = 3)
-    }
+    }*/
+
+    inverseDistanceWeighted(distanceTemperatureCombi(temperatures, location), power = 3)
   }
 
 
@@ -65,18 +79,18 @@ object Visualization {
     (colorValueMin + (colorValueMax - colorValueMin) * factor).toInt
   }
 
-  def linearInterpolation(pointA: Option[(Double, Color)], pointB:Option[(Double, Color)], value: Double):Color = (pointA, pointB) match {
-    case (Some((pAValue, pAColor)), Some((pBValue, pBColor))) => {
-      val li = linearInterpolationValue(pAValue, pBValue, value) _
-      Color(
-        li(pAColor.red, pBColor.red),
-        li(pAColor.green, pBColor.green),
-        li(pAColor.blue, pBColor.blue)
-      )
-    }
-    case (Some(pA), None) => pA._2
-    case (None, Some(pB)) => pB._2
-    case _ => Color(0,0,0)
+  def linearInterpolation(pointA: Option[(Double, Color)], pointB: Option[(Double, Color)], value: Double): Color = (pointA, pointB) match {
+      case (Some((pAValue, pAColor)), Some((pBValue, pBColor))) => {
+        val li = linearInterpolationValue(pAValue, pBValue, value) _
+        Color(
+          li(pAColor.red, pBColor.red),
+          li(pAColor.green, pBColor.green),
+          li(pAColor.blue, pBColor.blue)
+        )
+      }
+      case (Some(pA), None) => pA._2
+      case (None, Some(pB)) => pB._2
+      case _ => Color(0, 0, 0)
   }
 
   /**
@@ -94,13 +108,53 @@ object Visualization {
     }
   }
 
+  def posToLocation(imageWidth: Int, imageHeight: Int)(pos: Int): Location = {
+    val widthFactor = 180 * 2 / imageWidth.toDouble
+    val heightFactor = 90 * 2 / imageHeight.toDouble
+
+    val x: Int = pos % imageWidth
+    val y: Int = pos / imageWidth
+
+    Location(90 - (y * heightFactor), (x * widthFactor) - 180)
+  }
+
   /**
     * @param temperatures Known temperatures
     * @param colors       Color scale
     * @return A 360×180 image where each pixel shows the predicted temperature at its location
     */
   def visualize(temperatures: Iterable[(Location, Double)], colors: Iterable[(Double, Color)]): Image = {
-    ???
+    val imageWidth = 360
+    val imageHeight = 180
+
+    val locationMap = posToLocation(imageWidth, imageHeight) _
+
+    val pixels = (0 until imageHeight * imageWidth).par.map {
+      pos => pos -> interpolateColor(
+          colors,
+          predictTemperature(
+            temperatures,
+            locationMap(pos)
+          )
+        ).pixel
+      }
+      .seq
+      .sortBy(_._1)
+      .map(_._2)
+
+
+//    var l = timings.toArray().map {
+//      case (s: String, l: Long) => (s, l)
+//    }.groupBy(_._1).mapValues(_.foldLeft((0L, 0)) {
+//      case ((s, c), (_, l)) => (s + l, c + 1)
+//    }).map {
+//      case (s, (l, i)) => (s, l, i, l / i.toDouble)
+//    }
+//
+//    l.foreach(println)
+
+
+    Image(imageWidth, imageHeight, pixels.toArray)
   }
 
 }

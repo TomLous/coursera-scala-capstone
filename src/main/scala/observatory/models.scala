@@ -3,6 +3,8 @@ package observatory
 import scala.math._
 import java.time.LocalDate
 
+import com.sksamuel.scrimage.{Pixel, RGBColor}
+
 case class Location(lat: Double, lon: Double) {
   lazy val point:Point = Point(toRadians(lat), toRadians(lon))
 
@@ -33,7 +35,9 @@ case class Point(ϕ: Double, λ: Double) {
 }
 
 
-case class Color(red: Int, green: Int, blue: Int)
+case class Color(red: Int, green: Int, blue: Int) {
+  lazy val pixel = Pixel(RGBColor(red, green, blue))
+}
 
 case class Joined(id: String, latitude:Double, longitude: Double, day: Int, month: Int, year: Int, temperature: Double)
 
