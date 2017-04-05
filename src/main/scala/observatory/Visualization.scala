@@ -67,7 +67,7 @@ object Visualization {
 
   def linearInterpolation(pointA: Option[(Double, Color)], pointB:Option[(Double, Color)], value: Double):Color = (pointA, pointB) match {
     case (Some((pAValue, pAColor)), Some((pBValue, pBColor))) => {
-      val li = linearInterpolationValue(pAValue, pBValue, value)
+      val li = linearInterpolationValue(pAValue, pBValue, value) _
       Color(
         li(pAColor.red, pBColor.red),
         li(pAColor.green, pBColor.green),

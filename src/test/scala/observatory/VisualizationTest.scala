@@ -47,6 +47,35 @@ class VisualizationTest extends FunSuite with Checkers with SparkJob {
     assert(Visualization.predictTemperature(locateAverage, Location(4.5,52.0)).round === 19)
   }
 
+  test("linearInterpolationValue"){
+    assert(Visualization.linearInterpolationValue(0,10,5)(0,100) === 50)
+    assert(Visualization.linearInterpolationValue(2,12,7)(0,100) === 50)
+    assert(Visualization.linearInterpolationValue(2,12,7)(10,20) === 15)
+    assert(Visualization.linearInterpolationValue(0,10,1)(10,20) === 11)
+    assert(Visualization.linearInterpolationValue(0,20,3)(10,20) === 11)
+  }
+
+  test("linearInterpolation"){
+    assert(Visualization.linearInterpolation(Some((0,Color(0,0,0))), Some((100, Color(255, 255, 255))), 50) === Color(127,127,127))
+    assert(Visualization.linearInterpolation(Some((0,Color(0,0,0))), Some((80, Color(255, 255, 255))), 10) === Color(31,31,31))
+    assert(Visualization.linearInterpolation(Some((0,Color(255,127,0))), Some((80, Color(0, 127, 255))), 10) === Color(223,127,31))
+  }
+
+  test("interpolateColor"){
+    val palette = List(
+      (100.0, Color(255, 255, 255)),
+      (50.0, Color(0, 0, 0)),
+      (0.0, Color(255, 0, 127))
+    )
+
+    assert(Visualization.interpolateColor(palette, 50.0) === Color(0, 0, 0))
+    assert(Visualization.interpolateColor(palette, 0.0) === Color(255, 0, 127))
+    assert(Visualization.interpolateColor(palette, -10.0) === Color(255, 0, 127))
+    assert(Visualization.interpolateColor(palette, 200.0) === Color(255, 255, 255))
+    assert(Visualization.interpolateColor(palette, 75.0) === Color(127, 127, 127))
+    assert(Visualization.interpolateColor(palette, 25.0) === Color(127, 0, 63))
+  }
+
   /*
    (Location(67.55,-63.783),-6.654451137884884)
 (Location(45.933,126.567),5.439407814407809)
