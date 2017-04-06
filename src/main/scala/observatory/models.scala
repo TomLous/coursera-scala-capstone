@@ -1,9 +1,10 @@
 package observatory
 
-import scala.math._
 import java.time.LocalDate
 
 import com.sksamuel.scrimage.{Pixel, RGBColor}
+
+import scala.math._
 
 case class Location(lat: Double, lon: Double) {
   lazy val point:Point = Point(toRadians(lat), toRadians(lon))
@@ -13,16 +14,22 @@ case class Location(lat: Double, lon: Double) {
 case class Point(ϕ: Double, λ: Double) {
   lazy val location:Location = Location(toDegrees(ϕ), toDegrees(λ))
 
-
-//  def haversineDistance(other: Point): Double = {
-//    var r = 6372.8 // mean radius Earth in KM
-//    r * greatCircleDistance(other) * 1000
-//  }
+  /**
+    * Added for special case: https://www.coursera.org/learn/scala-capstone/discussions/weeks/2/threads/YY0u6Ax8EeeqzRJFs29uDA
+    *
+    * @param other Point for distance calculatuion
+    * @return distance on earth in meters
+    */
+  def haversineEarthDistance(other: Point): Double = {
+    var r = 6372.8 // mean radius Earth in KM
+    r * greatCircleDistance(other) * 1000
+  }
 
   /**
     * https://en.wikipedia.org/wiki/Great-circle_distance#Computational_formulas
-    * @param other pointB
-    * @return distance in meters
+    *
+    * @param other Point for distance calculatuion
+    * @return distance in radians
     */
   def greatCircleDistance(other: Point): Double = {
     val Δϕ = abs(other.ϕ - ϕ)

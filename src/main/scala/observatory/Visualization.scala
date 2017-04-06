@@ -10,7 +10,6 @@ import scala.math._
   */
 object Visualization {
 
-
   /**
     * @param temperatures Known temperatures
     * @param colors       Color scale
@@ -45,25 +44,21 @@ object Visualization {
     * @return The predicted temperature at `location`
     */
   def predictTemperature(temperatures: Iterable[(Location, Double)], location: Location): Double = {
-    /*
-    // Removed this because too much overhead and not extremely usefull?
     val exactTemperature = temperatures
       .par
       .filter(_._1 == location)
       .map(_._2)
       .headOption
 
-    val res =exactTemperature match {
+    exactTemperature match {
       case Some(temp) => temp
       case _ => inverseDistanceWeighted(distanceTemperatureCombi(temperatures, location), power = 3)
-    }*/
-
-    inverseDistanceWeighted(distanceTemperatureCombi(temperatures, location), power = 3)
+    }
   }
 
   def distanceTemperatureCombi(temperatures: Iterable[(Location, Double)], location: Location): Iterable[(Double, Double)] = {
     temperatures.map {
-      case (otherLocation, temperature) => (location.point greatCircleDistance otherLocation.point, temperature)
+      case (otherLocation, temperature) => (location.point haversineEarthDistance otherLocation.point, temperature)
     }
   }
 
@@ -105,6 +100,14 @@ object Visualization {
     }
   }
 
+  /**
+    * Calculates the color based on linear interpolation of the value between ColorPoint A and ColorPointB
+    *
+    * @param pointA tuple of value & color
+    * @param pointB tuple of value & color
+    * @param value  for interpolation
+    * @return Color
+    */
   def linearInterpolation(pointA: Option[(Double, Color)], pointB: Option[(Double, Color)], value: Double): Color = (pointA, pointB) match {
       case (Some((pAValue, pAColor)), Some((pBValue, pBColor))) => {
         val li = linearInterpolationValue(pAValue, pBValue, value) _
@@ -119,12 +122,30 @@ object Visualization {
       case _ => Color(0, 0, 0)
   }
 
+  /**
+    * (Partial) function that calculates a transformed value based on source range & source value (actual values) to target range (color value)
+    *
+    * @param pointValueMin value at point A
+    * @param pointValueMax value at point B
+    * @param value         between A & B
+    * @param colorValueMin target range lowerbound
+    * @param colorValueMax target range upperbound
+    * @return inperpolated value
+    */
   def linearInterpolationValue(pointValueMin: Double, pointValueMax: Double, value: Double)(colorValueMin: Int, colorValueMax: Int): Int = {
     val factor = (value - pointValueMin) / (pointValueMax - pointValueMin)
 
     round(colorValueMin + (colorValueMax - colorValueMin) * factor).toInt
   }
 
+  /**
+    * (Partial) function that returns a Location based on a position in an image  (starting from top left (90.0, -180.0 | 0, 0) moving right -> down), taking in account the image dimensions
+    *
+    * @param imageWidth  pixels
+    * @param imageHeight pixels
+    * @param pos         withing image as y * imageWidth + x
+    * @return Location (lat long)
+    */
   def posToLocation(imageWidth: Int, imageHeight: Int)(pos: Int): Location = {
     val widthFactor = 180 * 2 / imageWidth.toDouble
     val heightFactor = 90 * 2 / imageHeight.toDouble

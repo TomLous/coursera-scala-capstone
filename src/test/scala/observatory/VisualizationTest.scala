@@ -26,12 +26,12 @@ class VisualizationTest extends FunSuite with Checkers with SparkJob {
 
 
   test("distanceTemperatureCombi") {
-    assert(Visualization.distanceTemperatureCombi(List((Location(10, 10), 10), (Location(30, 30), 30)), Location(20, 20)).toList.sortBy(_._2) === List((0.2424670477208617, 10.0), (0.23530045911535308, 30.0)))
+    assert(Visualization.distanceTemperatureCombi(List((Location(10, 10), 10), (Location(30, 30), 30)), Location(20, 20)).toList.sortBy(_._2) === List((0.2424670477208617 * 6372.8 * 1000, 10.0), (0.23530045911535308 * 6372.8 * 1000, 30.0)))
   }
 
   test("inverseDistanceWeighted") {
-    assert(Visualization.inverseDistanceWeighted(Visualization.distanceTemperatureCombi(List((Location(10, 10), 10), (Location(30, 30), 30)), Location(20, 20)), 3) === 20.449734945928157)
-    assert(Visualization.inverseDistanceWeighted(Visualization.distanceTemperatureCombi(List((Location(10, 10), 10), (Location(10, 30), 30), (Location(10, 30), 20)), Location(30, 10)), 3) === 16.584950329573303)
+    assert(Visualization.inverseDistanceWeighted(Visualization.distanceTemperatureCombi(List((Location(10, 10), 10), (Location(30, 30), 30)), Location(20, 20)), 3).round === 20)
+    assert(Visualization.inverseDistanceWeighted(Visualization.distanceTemperatureCombi(List((Location(10, 10), 10), (Location(10, 30), 30), (Location(10, 30), 20)), Location(30, 10)), 3).round === 17)
   }
 
   /*test("Distance 0.0") {
@@ -45,14 +45,21 @@ class VisualizationTest extends FunSuite with Checkers with SparkJob {
   }*/
 
   test("Distance 0.0") {
-    assert(Visualization.predictTemperature(locateAverage, Location(67.55, -63.783)) === 3.715730187132149)
-    assert(Visualization.predictTemperature(locateAverage, Location(39.083, -76.767)) === 12.519148135793017)
+    assert(Visualization.predictTemperature(locateAverage, Location(67.55, -63.783)).round === 4)
+    assert(Visualization.predictTemperature(locateAverage, Location(39.083, -76.767)).round === 13)
   }
 
   test("Distance != 0.0") {
     assert(Visualization.predictTemperature(locateAverage, Location(52.0, 4.5)).round === 6)
     assert(Visualization.predictTemperature(locateAverage, Location(4.5, 52.0)).round === 13)
     assert(Visualization.predictTemperature(locateAverage, Location(0.0, 0.0)).round === 7)
+
+  }
+
+  test("predictTemperature small sets") {
+    assert(Visualization.predictTemperature(List((Location(45.0, -90.0), 10.0), (Location(-45.0, 0.0), 20.0)), Location(0.0, -45.0)) === 15.0)
+    assert(Visualization.predictTemperature(List((Location(0.0, 0.0), 10.0)), Location(0.0, 0.0)) === 10.0)
+    assert(Visualization.predictTemperature(List((Location(45.0, -90.0), 0.0), (Location(-45.0, 0.0), 59.028308521858634)), Location(0.0, 0.0)).round === 52)
   }
 
   test("linearInterpolationValue") {
@@ -91,7 +98,6 @@ class VisualizationTest extends FunSuite with Checkers with SparkJob {
     assert(Visualization.posToLocation(720,360)(360) === Location(90.0,0.0))
     assert(Visualization.posToLocation(720,360)(129960) === Location(0.0,0.0))
   }
-
 
   test("visualize") {
     val palette = List(
