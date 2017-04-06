@@ -10,14 +10,12 @@ import org.scalatest.prop.Checkers
 @RunWith(classOf[JUnitRunner])
 class VisualizationTest extends FunSuite with Checkers with SparkJob {
 
-  val year = 1975
-  val debug = true
-
-  val stationsPath: String = "/stations.csv"
-  val temperaturePath: String = s"/$year-sample50k.csvg"
-
   lazy val locateTemperatures = Extraction.locateTemperatures(year, stationsPath, temperaturePath)
   lazy val locateAverage = Extraction.locationYearlyAverageRecords(locateTemperatures)
+  val year = 1975
+  val debug = true
+  val stationsPath: String = "/stations.csv"
+  val temperaturePath: String = s"/$year-sample50k.csvg"
 
 
   test("locationYearlyAverageRecords") {
@@ -54,6 +52,7 @@ class VisualizationTest extends FunSuite with Checkers with SparkJob {
   test("Distance != 0.0") {
     assert(Visualization.predictTemperature(locateAverage, Location(52.0, 4.5)).round === 6)
     assert(Visualization.predictTemperature(locateAverage, Location(4.5, 52.0)).round === 13)
+    assert(Visualization.predictTemperature(locateAverage, Location(0.0, 0.0)).round === 7)
   }
 
   test("linearInterpolationValue") {
@@ -61,28 +60,28 @@ class VisualizationTest extends FunSuite with Checkers with SparkJob {
     assert(Visualization.linearInterpolationValue(2, 12, 7)(0, 100) === 50)
     assert(Visualization.linearInterpolationValue(2, 12, 7)(10, 20) === 15)
     assert(Visualization.linearInterpolationValue(0, 10, 1)(10, 20) === 11)
-    assert(Visualization.linearInterpolationValue(0, 20, 3)(10, 20) === 11)
+    assert(Visualization.linearInterpolationValue(0, 20, 3)(10, 20) === 12)
   }
 
   test("linearInterpolation") {
-    assert(Visualization.linearInterpolation(Some((0, Color(0, 0, 0))), Some((100, Color(255, 255, 255))), 50) === Color(127, 127, 127))
-    assert(Visualization.linearInterpolation(Some((0, Color(0, 0, 0))), Some((80, Color(255, 255, 255))), 10) === Color(31, 31, 31))
-    assert(Visualization.linearInterpolation(Some((0, Color(255, 127, 0))), Some((80, Color(0, 127, 255))), 10) === Color(223, 127, 31))
+    assert(Visualization.linearInterpolation(Some((0, Color(0, 0, 0))), Some((100, Color(255, 255, 255))), 50) === Color(128, 128, 128))
+    assert(Visualization.linearInterpolation(Some((0, Color(0, 0, 0))), Some((80, Color(255, 255, 255))), 10) === Color(32, 32, 32))
+    assert(Visualization.linearInterpolation(Some((0, Color(255, 128, 0))), Some((80, Color(0, 128, 255))), 10) === Color(223, 128, 32))
   }
 
   test("interpolateColor") {
     val palette = List(
       (100.0, Color(255, 255, 255)),
       (50.0, Color(0, 0, 0)),
-      (0.0, Color(255, 0, 127))
+      (0.0, Color(255, 0, 128))
     )
 
     assert(Visualization.interpolateColor(palette, 50.0) === Color(0, 0, 0))
-    assert(Visualization.interpolateColor(palette, 0.0) === Color(255, 0, 127))
-    assert(Visualization.interpolateColor(palette, -10.0) === Color(255, 0, 127))
+    assert(Visualization.interpolateColor(palette, 0.0) === Color(255, 0, 128))
+    assert(Visualization.interpolateColor(palette, -10.0) === Color(255, 0, 128))
     assert(Visualization.interpolateColor(palette, 200.0) === Color(255, 255, 255))
-    assert(Visualization.interpolateColor(palette, 75.0) === Color(127, 127, 127))
-    assert(Visualization.interpolateColor(palette, 25.0) === Color(127, 0, 63))
+    assert(Visualization.interpolateColor(palette, 75.0) === Color(128, 128, 128))
+    assert(Visualization.interpolateColor(palette, 25.0) === Color(128, 0, 64))
   }
 
   test("posToLocation") {
