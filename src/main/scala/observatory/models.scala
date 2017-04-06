@@ -11,6 +11,23 @@ case class Location(lat: Double, lon: Double) {
 
 }
 
+
+/**
+  * Source http://wiki.openstreetmap.org/wiki/Slippy_map_tilenames
+  *
+  * @param x    Point
+  * @param y    Point
+  * @param zoom Zoom Level
+  */
+case class Tile(x: Int, y: Int, zoom: Int) {
+  lazy val location: Location = Location(
+    lat = toDegrees(atan(sinh(Pi * (1.0 - 2.0 * y.toDouble / (1 << zoom))))),
+    lon = x.toDouble / (1 << zoom) * 360.0 - 180.0)
+
+  def toURI = new java.net.URI("http://tile.openstreetmap.org/" + zoom + "/" + x + "/" + y + ".png")
+}
+
+
 case class Point(ϕ: Double, λ: Double) {
   lazy val location:Location = Location(toDegrees(ϕ), toDegrees(λ))
 
