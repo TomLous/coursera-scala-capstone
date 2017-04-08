@@ -29,7 +29,7 @@ object Visualization {
             temperatures,
             locationMap(pos)
           )
-        ).pixel
+        ).pixel()
     }
       .seq
       .sortBy(_._1)

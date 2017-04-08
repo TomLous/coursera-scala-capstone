@@ -2,7 +2,7 @@ package observatory
 
 import java.time.LocalDate
 
-import com.sksamuel.scrimage.{Pixel, RGBColor}
+import com.sksamuel.scrimage.RGBColor
 
 import scala.math._
 
@@ -19,10 +19,11 @@ case class Location(lat: Double, lon: Double) {
   * @param y    Point
   * @param zoom Zoom Level
   */
-case class Tile(x: Int, y: Int, zoom: Int) {
+case class Tile(x: Double, y: Double, zoom: Int) {
   lazy val location: Location = Location(
-    lat = toDegrees(atan(sinh(Pi * (1.0 - 2.0 * y.toDouble / (1 << zoom))))),
-    lon = x.toDouble / (1 << zoom) * 360.0 - 180.0)
+    lat = toDegrees(atan(sinh(Pi * (1.0 - 2.0 * y / (1 << zoom))))),
+    lon = x / (1 << zoom) * 360.0 - 180.0)
+
 
   def toURI = new java.net.URI("http://tile.openstreetmap.org/" + zoom + "/" + x + "/" + y + ".png")
 }
@@ -60,7 +61,7 @@ case class Point(ϕ: Double, λ: Double) {
 
 
 case class Color(red: Int, green: Int, blue: Int) {
-  lazy val pixel = Pixel(RGBColor(red, green, blue))
+  def pixel(alpha: Int = 255) = RGBColor(red, green, blue, alpha).toPixel
 }
 
 case class Joined(id: String, latitude:Double, longitude: Double, day: Int, month: Int, year: Int, temperature: Double)

@@ -1,6 +1,7 @@
 package observatory
 
 import com.sksamuel.scrimage.Image
+import observatory.Visualization._
 
 /**
   * 3rd milestone: interactive visualization
@@ -25,8 +26,30 @@ object Interaction {
     * @return A 256×256 image showing the contents of the tile defined by `x`, `y` and `zooms`
     */
   def tile(temperatures: Iterable[(Location, Double)], colors: Iterable[(Double, Color)], zoom: Int, x: Int, y: Int): Image = {
-    ???
+    val imageWidth = 256
+    val imageHeight = 256
+
+
+    val pixels = (0 until imageWidth * imageHeight)
+      .par.map(pos => {
+      val xPos = (pos % imageWidth).toDouble / imageWidth + x // column of image as fraction with offset x
+      val yPos = (pos / imageHeight).toDouble / imageHeight + y // row of image as fraction with offset y
+
+      pos -> interpolateColor(
+        colors,
+        predictTemperature(
+          temperatures,
+          Tile(xPos, yPos, zoom).location
+        )
+      ).pixel(127)
+    })
+      .seq
+      .sortBy(_._1)
+      .map(_._2)
+
+    Image(imageWidth, imageHeight, pixels.toArray)
   }
+
 
   /**
     * Generates all the tiles for zoom levels 0 to 3 (included), for all the given years.
