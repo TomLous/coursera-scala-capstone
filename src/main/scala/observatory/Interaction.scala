@@ -29,7 +29,6 @@ object Interaction {
     val imageWidth = 256
     val imageHeight = 256
 
-
     val pixels = (0 until imageWidth * imageHeight)
       .par.map(pos => {
       val xPos = (pos % imageWidth).toDouble / imageWidth + x // column of image as fraction with offset x
