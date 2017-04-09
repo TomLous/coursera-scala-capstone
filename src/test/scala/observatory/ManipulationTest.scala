@@ -25,7 +25,15 @@ class ManipulationTest extends FunSuite with Checkers {
     } yield gridFetch(lat, lon)
 
 
-    gridpoints.foreach(println)
+    assert(gridpoints.size === 360 * 180)
+    assert(gridpoints(360 * 180 - 1) === 0.930407896834476)
   }
 
+  test("average") {
+    val t = List(List((Location(0.0, 0.0), 10.0)), List((Location(0.2, 0.3), 20.0)), List((Location(-0.5, -0.8), 5.0)))
+
+    val avgs = Manipulation.average(t)
+
+    assert(avgs(0, 0) === 11.666666666666666)
+  }
 }
