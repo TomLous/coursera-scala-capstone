@@ -11,8 +11,29 @@ object Manipulation {
     *         returns the predicted temperature at this location
     */
   def makeGrid(temperatures: Iterable[(Location, Double)]): (Int, Int) => Double = {
-    ???
+    val grid: Map[Location, Double] = {
+      for {
+        lat <- -89 to 90
+        lon <- -180 to 179
+      } yield Location(lat, lon) -> Visualization.predictTemperature(temperatures, Location(lat, lon))
+    }.toMap
+
+    (lat, lon) => grid(Location(lat, lon))
   }
+
+
+  /*{
+    (lat, lon) => {
+      assert(lat > -90 && lat <= 90)
+      assert(lon > -180 && lat <= 180)
+      val (totalTemp, totalCount) = temperatures.filter{
+        case (location, _) => location.lat.toInt == lat && location.lon.toInt == lon
+      }.foldLeft((0.0, 0)){
+        case ((sum, count), (_, temp)) => (sum + temp, count+1)
+      }
+      totalTemp / totalCount
+    }
+  }*/
 
   /**
     * @param temperaturess Sequence of known temperatures over the years (each element of the collection

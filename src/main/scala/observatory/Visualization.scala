@@ -44,15 +44,11 @@ object Visualization {
     * @return The predicted temperature at `location`
     */
   def predictTemperature(temperatures: Iterable[(Location, Double)], location: Location): Double = {
-    val exactTemperature = temperatures
-      .par
-      .filter(_._1 == location)
-      .map(_._2)
-      .headOption
+    val predictions: Iterable[(Double, Double)] = distanceTemperatureCombi(temperatures, location)
 
-    exactTemperature match {
-      case Some(temp) => temp
-      case _ => inverseDistanceWeighted(distanceTemperatureCombi(temperatures, location), power = 3)
+    predictions.find(_._1 == 0.0) match {
+      case Some((_, temp)) => temp
+      case _ => inverseDistanceWeighted(predictions, power = 3)
     }
   }
 
@@ -109,17 +105,17 @@ object Visualization {
     * @return Color
     */
   def linearInterpolation(pointA: Option[(Double, Color)], pointB: Option[(Double, Color)], value: Double): Color = (pointA, pointB) match {
-      case (Some((pAValue, pAColor)), Some((pBValue, pBColor))) => {
-        val li = linearInterpolationValue(pAValue, pBValue, value) _
-        Color(
-          li(pAColor.red, pBColor.red),
-          li(pAColor.green, pBColor.green),
-          li(pAColor.blue, pBColor.blue)
-        )
-      }
-      case (Some(pA), None) => pA._2
-      case (None, Some(pB)) => pB._2
-      case _ => Color(0, 0, 0)
+    case (Some((pAValue, pAColor)), Some((pBValue, pBColor))) => {
+      val li = linearInterpolationValue(pAValue, pBValue, value) _
+      Color(
+        li(pAColor.red, pBColor.red),
+        li(pAColor.green, pBColor.green),
+        li(pAColor.blue, pBColor.blue)
+      )
+    }
+    case (Some(pA), None) => pA._2
+    case (None, Some(pB)) => pB._2
+    case _ => Color(0, 0, 0)
   }
 
   /**
@@ -154,6 +150,20 @@ object Visualization {
     val y: Int = pos / imageWidth
 
     Location(90 - (y * heightFactor), (x * widthFactor) - 180)
+  }
+
+  def distance(locA: Location, locB: Location): Double = {
+    val Location(latA, lonA) = locA
+    val Location(latB, lonB) = locB
+    val latDistance = toRadians(latB - latA)
+    val lonDistance = toRadians(lonB - lonA)
+
+    val a = pow(sin(latDistance / 2), 2) +
+      cos(toRadians(latA)) * cos(toRadians(latB)) *
+        pow(sin(lonDistance / 2), 2)
+
+    val c = 2 * atan2(sqrt(a), sqrt(1 - a))
+    c * 6371
   }
 
 }
