@@ -24,6 +24,8 @@ case class Tile(x: Double, y: Double, zoom: Int) {
     lat = toDegrees(atan(sinh(Pi * (1.0 - 2.0 * y / (1 << zoom))))),
     lon = x / (1 << zoom) * 360.0 - 180.0)
 
+  def applyGrid(grid: (Int, Int) => Double):Double = grid(round(location.lat).toInt, round(location.lon).toInt)
+
 
   def toURI = new java.net.URI("http://tile.openstreetmap.org/" + zoom + "/" + x + "/" + y + ".png")
 }

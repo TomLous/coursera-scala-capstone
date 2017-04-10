@@ -1,6 +1,7 @@
 package observatory
 
-import com.sksamuel.scrimage.{Image, Pixel}
+import com.sksamuel.scrimage.Image
+import observatory.Visualization.interpolateColor
 
 /**
   * 5th milestone: value-added information visualization
@@ -25,8 +26,14 @@ object Visualization2 {
     d10: Double,
     d11: Double
   ): Double = {
-    ???
+    d00 * (1 - x) * (1 - y) +
+    d10 *      x  * (1 - y) +
+    d01 * (1 - x) *      y  +
+    d11 *      x  *      y
   }
+
+
+
 
   /**
     * @param grid Grid to visualize
@@ -43,7 +50,33 @@ object Visualization2 {
     x: Int,
     y: Int
   ): Image = {
-    ???
+    val imageWidth = 256
+    val imageHeight = 256
+
+    val pixels = (0 until imageWidth * imageHeight)
+      .par.map(pos => {
+      val relXPos = (pos % imageWidth).toDouble / imageWidth
+      val relYPos = (pos / imageHeight).toDouble / imageHeight
+
+      val gridValues: Map[(Int, Int), Double] = {
+        for {
+          tileX <- 0 to 1
+          tileY <- 0 to 1
+        } yield (tileX, tileY) -> Tile(tileX, tileY, zoom).applyGrid(grid)
+      }.toMap
+
+      pos -> interpolateColor(
+        colors,
+        bilinearInterpolation(relXPos, relYPos, gridValues((0,0)), gridValues((0,1)), gridValues((1,0)), gridValues((1,1)))
+      ).pixel(127)
+    })
+      .seq
+      .sortBy(_._1)
+      .map(_._2)
+
+
+    Image(imageWidth, imageHeight, pixels.toArray)
+
   }
 
 }
