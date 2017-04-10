@@ -58,11 +58,26 @@ object Visualization2 {
       val relXPos = (pos % imageWidth).toDouble / imageWidth
       val relYPos = (pos / imageHeight).toDouble / imageHeight
 
+
+//      // note that loc is the Location of the pixel!
+//      val d00 = grid(scala.math.ceil(loc.lat).toInt, scala.math.floor(loc.lon).toInt) // nw
+//      val d01 = grid(scala.math.floor(loc.lat).toInt, scala.math.floor(loc.lon).toInt) // sw
+//      val d10 = grid(scala.math.ceil(loc.lat).toInt, scala.math.ceil(loc.lon).toInt) // ne
+//      val d11 = grid(scala.math.floor(loc.lat).toInt, scala.math.ceil(loc.lon).toInt) // se
+
       val gridValues: Map[(Int, Int), Double] = {
         for {
           tileX <- 0 to 1
           tileY <- 0 to 1
-        } yield (tileX, tileY) -> Tile(tileX, tileY, zoom).applyGrid(grid)
+        } yield (tileY, tileX) -> {
+          val tileLocation = Tile(tileX + x, tileY + y, zoom).location
+          val lon = tileLocation.lonInt(tileX == 1) min 179 max -180
+          val lat = tileLocation.latInt(tileY == 1) min 90 max -89
+          if(lon < -180 || lon > 179 || lat < -89 || lon > 90){
+            println(s"x: $x, y: $y, zoom: $zoom, location: $tileLocation, relXPos: $relXPos, relYPos: $relYPos, tileX: $tileX, tileY: $tileY, lat: $lat, lon: $lon")
+          }
+          grid(lat, lon)
+        }
       }.toMap
 
       pos -> interpolateColor(
