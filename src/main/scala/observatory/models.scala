@@ -12,6 +12,10 @@ case class Location(lat: Double, lon: Double) {
   def latInt(roundUp:Boolean):Int = if(roundUp) ceil(lat).toInt else floor(lat).toInt
   def lonInt(roundUp:Boolean):Int = if(roundUp) ceil(lon).toInt else floor(lon).toInt
 
+//  private def rounded(roundUp:Boolean)(value: Double): Int = {
+//
+//  }
+
 }
 
 
