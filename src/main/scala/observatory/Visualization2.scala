@@ -45,7 +45,7 @@ object Visualization2 {
     * @param imageHeight in pixels
     * @return 'Map' of (pos->Location) within the tile
     */
-  def tileLocations(offsetX: Int, offsetY: Int, zoom: Int, imageWidth: Int, imageHeight: Int):immutable.IndexedSeq[(Int, Location)] = {
+  def pixelLocations(offsetX: Int, offsetY: Int, zoom: Int, imageWidth: Int, imageHeight: Int):immutable.IndexedSeq[(Int, Location)] = {
     for{
       xPixel <- 0 until imageWidth
       yPixel <- 0 until imageHeight
@@ -72,24 +72,26 @@ object Visualization2 {
     val imageWidth = 256
     val imageHeight = 256
 
-    val pixels = tileLocations(x, y, zoom, imageWidth, imageHeight).par.map{
+    val pixels = pixelLocations(x, y, zoom, imageWidth, imageHeight).par.map{
       case (pos,pixelLocation) => {
 
-        val (latMax, latMin) = (ceil(pixelLocation.lat), floor(pixelLocation.lat))
-        val (lonMax, lonMin) = (ceil(pixelLocation.lon), floor(pixelLocation.lon))
+        val latRange = List(floor(pixelLocation.lat).toInt, ceil(pixelLocation.lat).toInt)
+        val lonRange = List(floor(pixelLocation.lon).toInt, ceil(pixelLocation.lon).toInt)
 
-        val d00 = grid(latMax.toInt, lonMin.toInt) // nw
-        val d01 = grid(latMin.toInt, lonMin.toInt) // sw
-        val d10 = grid(latMax.toInt, lonMax.toInt) // ne
-        val d11 = grid(latMin.toInt, lonMax.toInt) // se
+        val d = {
+          for {
+            xPos <- 0 to 1
+            yPos <- 0 to 1
+          } yield (xPos, yPos) -> grid(latRange(1- yPos), lonRange(xPos))
+        }.toMap
 
-        val xFraction = pixelLocation.lon - lonMin
-        val yFraction = latMax - pixelLocation.lat
+        val xFraction = pixelLocation.lon - lonRange(0)
+        val yFraction = latRange(1) - pixelLocation.lat
 
 
         pos -> interpolateColor(
           colors,
-          bilinearInterpolation(x=xFraction, y=yFraction, d00=d00, d01=d01, d10=d10, d11=d11)
+          bilinearInterpolation(x=xFraction, y=yFraction, d00=d((0,0)), d01=d((0,1)), d10=d((1,0)), d11=d((1,1)))
         ).pixel(127)
       }}
       .seq

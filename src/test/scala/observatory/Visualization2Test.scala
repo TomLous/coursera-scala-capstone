@@ -5,6 +5,8 @@ import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.prop.Checkers
 
+import scala.math._
+
 @RunWith(classOf[JUnitRunner])
 class Visualization2Test extends FunSuite with Checkers {
 
@@ -16,8 +18,8 @@ class Visualization2Test extends FunSuite with Checkers {
     val imageHeight = 5
 
 
-    val method1 = Visualization2.tileLocations(x, y, zoom, imageWidth, imageHeight).sortBy(_._1)
-    //    println(Visualization2.tileLocations(0,0,0,5,5))
+    val method1 = Visualization2.pixelLocations(x, y, zoom, imageWidth, imageHeight).sortBy(_._1)
+    //    println(Visualization2.pixelLocations(0,0,0,5,5))
 
 
     val method2 = (0 until imageWidth * imageHeight).map(
@@ -33,6 +35,47 @@ class Visualization2Test extends FunSuite with Checkers {
     ).sortBy(_._1)
 
     assert(method1 === method2)
+  }
+
+  test("compare d methods") {
+    val pixelLocation = Location(82.3, -65.6)
+
+    val (latMax, latMin) = (ceil(pixelLocation.lat), floor(pixelLocation.lat))
+    val (lonMax, lonMin) = (ceil(pixelLocation.lon), floor(pixelLocation.lon))
+
+    val d00 = (latMax.toInt, lonMin.toInt) // nw
+    val d01 = (latMin.toInt, lonMin.toInt) // sw
+    val d10 = (latMax.toInt, lonMax.toInt) // ne
+    val d11 = (latMin.toInt, lonMax.toInt) // se
+
+    val method1 = List((0,0)->d00, (0,1)->d01, (1,0)->d10, (1,1)->d11).toMap
+
+
+    val latRange = List(floor(pixelLocation.lat).toInt, ceil(pixelLocation.lat).toInt)
+    val lonRange = List(floor(pixelLocation.lon).toInt, ceil(pixelLocation.lon).toInt)
+
+    val method2 = {
+      for {
+        xPos <- 0 to 1
+        yPos <- 0 to 1
+      } yield ((xPos, yPos), (latRange(1 - yPos), lonRange(xPos)))
+    }.toMap
+
+    assert(method1 === method2)
+
+
+    val xFractionA = pixelLocation.lon - lonRange(0)
+    val yFractionA = latRange(1) - pixelLocation.lat
+
+    val xFractionB = pixelLocation.lon - lonMin
+    val yFractionB = latMax - pixelLocation.lat
+
+    assert(xFractionA === xFractionB)
+    assert(yFractionA === yFractionB)
+
+//    println(List(xFractionA, yFractionA))
+//    println(List(xFractionB, yFractionB))
+//
   }
 
   test("bilinearInterpolation"){
