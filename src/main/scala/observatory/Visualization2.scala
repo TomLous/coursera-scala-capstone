@@ -82,7 +82,7 @@ object Visualization2 {
           for {
             xPos <- 0 to 1
             yPos <- 0 to 1
-          } yield (xPos, yPos) -> grid(latRange(1- yPos), lonRange(xPos))
+          } yield (xPos, yPos) -> grid(latRange(1 - yPos), lonRange(xPos))
         }.toMap
 
         val xFraction = pixelLocation.lon - lonRange(0)
