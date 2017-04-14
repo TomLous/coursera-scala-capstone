@@ -36,12 +36,22 @@ object Visualization2 {
   }
 
 
+  /**
+    * Generates a sequence of pos, location  tuples for a Tile image
+    * @param offsetX TL Xpos of Tile
+    * @param offsetY TL YPos of Tile
+    * @param zoom zoom level of tile
+    * @param imageWidth in pixels
+    * @param imageHeight in pixels
+    * @return 'Map' of (pos->Location) within the tile
+    */
   def tileLocations(offsetX: Int, offsetY: Int, zoom: Int, imageWidth: Int, imageHeight: Int):immutable.IndexedSeq[(Int, Location)] = {
     for{
       xPixel <- 0 until imageWidth
       yPixel <- 0 until imageHeight
     } yield xPixel + yPixel * imageWidth -> Tile(xPixel.toDouble / imageWidth + offsetX, yPixel.toDouble / imageHeight + offsetY, zoom).location
   }
+
 
 
   /**
@@ -65,13 +75,16 @@ object Visualization2 {
     val pixels = tileLocations(x, y, zoom, imageWidth, imageHeight).par.map{
       case (pos,pixelLocation) => {
 
-        val d00 = grid(ceil(pixelLocation.lat).toInt, floor(pixelLocation.lon).toInt) // nw
-        val d01 = grid(floor(pixelLocation.lat).toInt, floor(pixelLocation.lon).toInt) // sw
-        val d10 = grid(ceil(pixelLocation.lat).toInt, ceil(pixelLocation.lon).toInt) // ne
-        val d11 = grid(floor(pixelLocation.lat).toInt, ceil(pixelLocation.lon).toInt) // se
+        val (latMax, latMin) = (ceil(pixelLocation.lat), floor(pixelLocation.lat))
+        val (lonMax, lonMin) = (ceil(pixelLocation.lon), floor(pixelLocation.lon))
 
-        val xFraction = pixelLocation.lon - floor(pixelLocation.lon)
-        val yFraction = ceil(pixelLocation.lat) - pixelLocation.lat
+        val d00 = grid(latMax.toInt, lonMin.toInt) // nw
+        val d01 = grid(latMin.toInt, lonMin.toInt) // sw
+        val d10 = grid(latMax.toInt, lonMax.toInt) // ne
+        val d11 = grid(latMin.toInt, lonMax.toInt) // se
+
+        val xFraction = pixelLocation.lon - lonMin
+        val yFraction = latMax - pixelLocation.lat
 
 
         pos -> interpolateColor(
@@ -85,7 +98,6 @@ object Visualization2 {
 
 
     Image(imageWidth, imageHeight, pixels.toArray)
-
   }
 
 }

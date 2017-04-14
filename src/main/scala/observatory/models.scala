@@ -8,14 +8,6 @@ import scala.math._
 
 case class Location(lat: Double, lon: Double) {
   lazy val point:Point = Point(toRadians(lat), toRadians(lon))
-
-  def latInt(roundUp:Boolean):Int = if(roundUp) ceil(lat).toInt else floor(lat).toInt
-  def lonInt(roundUp:Boolean):Int = if(roundUp) ceil(lon).toInt else floor(lon).toInt
-
-//  private def rounded(roundUp:Boolean)(value: Double): Int = {
-//
-//  }
-
 }
 
 
@@ -30,9 +22,6 @@ case class Tile(x: Double, y: Double, zoom: Int) {
   lazy val location: Location = Location(
     lat = toDegrees(atan(sinh(Pi * (1.0 - 2.0 * y / (1 << zoom))))),
     lon = x / (1 << zoom) * 360.0 - 180.0)
-
-  def applyGrid(grid: (Int, Int) => Double):Double = grid(round(location.lat).toInt, round(location.lon).toInt)
-
 
   def toURI = new java.net.URI("http://tile.openstreetmap.org/" + zoom + "/" + x + "/" + y + ".png")
 }

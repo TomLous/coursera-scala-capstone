@@ -44,4 +44,8 @@ class Visualization2Test extends FunSuite with Checkers {
     assert(Visualization2.bilinearInterpolation(1.0, 0.0, 10, 20, 30, 40) === 30.0)
   }
 
+  test("visualizeGrid"){
+    //@todo not implemented :-(
+  }
+
 }
