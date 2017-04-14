@@ -3,6 +3,7 @@ package observatory
 import com.sksamuel.scrimage.Image
 import observatory.Visualization.interpolateColor
 
+import scala.collection.immutable
 import scala.math._
 
 /**
@@ -35,6 +36,12 @@ object Visualization2 {
   }
 
 
+  def tileLocations(offsetX: Int, offsetY: Int, zoom: Int, imageWidth: Int, imageHeight: Int):immutable.IndexedSeq[(Int, Location)] = {
+    for{
+      xPixel <- 0 until imageWidth
+      yPixel <- 0 until imageHeight
+    } yield xPixel + yPixel * imageWidth -> Tile(xPixel.toDouble / imageWidth + offsetX, yPixel.toDouble / imageHeight + offsetY, zoom).location
+  }
 
 
   /**
@@ -71,11 +78,14 @@ object Visualization2 {
       val d10 = grid(ceil(pixelLocation.lat).toInt, ceil(pixelLocation.lon).toInt) // ne
       val d11 = grid(floor(pixelLocation.lat).toInt, ceil(pixelLocation.lon).toInt) // se
 
+      val xFraction = pixelLocation.lon - floor(pixelLocation.lon)
+      val yFraction = ceil(pixelLocation.lat) - pixelLocation.lat
+
 //      val interpolatedValue = bilinearInterpolation(x=relativeXPosInTile, y=relativeYPosInTile, d00=d00, d01=d01, d10=d10, d11=d11)
 
-//      println(s"x: $x, y: $y, zoom: $zoom, location: $pixelLocation, relXPos: $relXPos, relYPos: $relYPos, tileX: $xPos, tileY: $yPos, d00: $d00, d01: $d01, d10: $d10, d11: $d11")
+      println(s"x: $x, y: $y, zoom: $zoom, location: $pixelLocation, relXPos: $xFraction, relYPos: $yFraction, d00: $d00, d01: $d01, d10: $d10, d11: $d11")
 
-
+// -123 - -123.5
 
 //      // note that loc is the Location of the pixel!
 //      val d00 = grid(scala.math.ceil(loc.lat).toInt, scala.math.floor(loc.lon).toInt) // nw
@@ -104,7 +114,7 @@ object Visualization2 {
         colors,
 //        bilinearInterpolation(relXPos, relYPos, gridValues((0,0)), gridValues((0,1)), gridValues((1,0)), gridValues((1,1)))
 //        bilinearInterpolation(relYPos, relXPos, d00=d00, d01=d01, d10=d10, d11=d11)
-        bilinearInterpolation(x=relativeXPosInTile, y=relativeYPosInTile, d00=d00, d01=d01, d10=d10, d11=d11)
+        bilinearInterpolation(x=xFraction, y=yFraction, d00=d00, d01=d01, d10=d10, d11=d11)
       ).pixel(127)
     })
       .seq
