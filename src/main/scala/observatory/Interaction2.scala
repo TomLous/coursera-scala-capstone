@@ -59,7 +59,7 @@ object Interaction2 {
     val sv = sliderValue()
     val bounds = yearBounds(selectedLayer)()
     val yearValue = sv max bounds.min min bounds.max
-    println(s"$sv | $bounds | $yearValue")
+//    println(s"$sv | $bounds | $yearValue")
     Signal(yearValue)
   }
 
